@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29728.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SLAE", "SLAE\SLAE.vcxproj", "{9FA772DD-AB11-48A1-8285-24835133374B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9FA772DD-AB11-48A1-8285-24835133374B}.Debug|x64.ActiveCfg = Debug|x64
+		{9FA772DD-AB11-48A1-8285-24835133374B}.Debug|x64.Build.0 = Debug|x64
+		{9FA772DD-AB11-48A1-8285-24835133374B}.Debug|x86.ActiveCfg = Debug|Win32
+		{9FA772DD-AB11-48A1-8285-24835133374B}.Debug|x86.Build.0 = Debug|Win32
+		{9FA772DD-AB11-48A1-8285-24835133374B}.Release|x64.ActiveCfg = Release|x64
+		{9FA772DD-AB11-48A1-8285-24835133374B}.Release|x64.Build.0 = Release|x64
+		{9FA772DD-AB11-48A1-8285-24835133374B}.Release|x86.ActiveCfg = Release|Win32
+		{9FA772DD-AB11-48A1-8285-24835133374B}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4765E7EE-682A-4E08-8783-085B1A4DFF08}
+	EndGlobalSection
+EndGlobal
