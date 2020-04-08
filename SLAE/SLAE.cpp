@@ -23,12 +23,31 @@ int main()
 	Matrix m2("m2.txt");
 	Matrix m3("m3.txt");
 
-	std::cout << A1 << std::endl << A2 << std::endl << A3 << std::endl << b3 << std::endl << m1 << std::endl << m2 << std::endl << m3 << std::endl;
+	//std::cout << A1 << std::endl << A2 << std::endl << A3 << std::endl << b3 << std::endl << m1 << std::endl << m2 << std::endl << m3 << std::endl;
 
 	//std::ofstream oFile;
 	//oFile.open("out.txt");
 	//oFile << m1;
 	//oFile.close();
+
+	//Matrix t;
+	//std::cout << A3 << std::endl;
+	//t = A3.changeOneColumn(b3, 2);
+	//std::cout << A3 << std::endl;
+	//std::cout << t << std::endl;
+
+	//log << A1 << countDet(A1) << "\n";
+	//log << A2 << countDet(A2) << "\n";
+
+	Matrix t;
+
+	std::cout << A3 << std::endl;
+	std::cout << b3 << std::endl;
+
+	t = solveSLAE(A3, b3);
+
+	std::cout << t << std::endl;
+
 
 
 
@@ -46,6 +65,12 @@ int main()
 
 
 	
+
+
+
+
+
+
 
 
 

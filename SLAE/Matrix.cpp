@@ -4,15 +4,12 @@
 
 
 
-Matrix::Matrix(const int width, const int height) : m_width(width), m_height(height)
+Matrix::Matrix(const int height, const int width) : m_width(width), m_height(height)
 {
 	m_arr = new double*[m_height];
 	for (int i = 0; i < m_height; ++i)
 	{
 		m_arr[i] = new double[m_width];
-	}
-	for (int i = 0; i < m_height; ++i)
-	{
 		for (int j = 0; j < m_width; ++j)
 		{
 			m_arr[i][j] = 0;
@@ -23,15 +20,12 @@ Matrix::Matrix(const int width, const int height) : m_width(width), m_height(hei
 
 
 
-Matrix::Matrix(const double** arr, const int width, const int height) : m_width(width), m_height(height)
+Matrix::Matrix(const double** arr, const int height, const int width) : m_width(width), m_height(height)
 {
 	m_arr = new double* [m_height];
 	for (int i = 0; i < m_height; ++i)
 	{
 		m_arr[i] = new double[m_width];
-	}
-	for (int i = 0; i < m_height; ++i)
-	{
 		for (int j = 0; j < m_width; ++j)
 		{
 			m_arr[i][j] = arr[i][j];
@@ -55,10 +49,6 @@ Matrix::Matrix(const std::string fileName)
 	for (int i = 0; i < m_height; ++i)
 	{
 		m_arr[i] = new double[m_width];
-	}
-
-	for (int i = 0; i < m_height; ++i)
-	{
 		for (int j = 0; j < m_width; ++j)
 		{
 			iFile >> m_arr[i][j];
@@ -71,7 +61,7 @@ Matrix::Matrix(const std::string fileName)
 
 
 
-Matrix::Matrix(const std::string fileName, const int width, const int height) : m_width(width), m_height(height)
+Matrix::Matrix(const std::string fileName, const int height, const int width) : m_width(width), m_height(height)
 {
 	std::ifstream iFile;
 	iFile.open(fileName);
@@ -84,10 +74,6 @@ Matrix::Matrix(const std::string fileName, const int width, const int height) : 
 	for (int i = 0; i < m_height; ++i)
 	{
 		m_arr[i] = new double[m_width];
-	}
-
-	for (int i = 0; i < m_height; ++i)
-	{
 		for (int j = 0; j < m_width; ++j)
 		{
 			iFile >> m_arr[i][j];
@@ -95,6 +81,38 @@ Matrix::Matrix(const std::string fileName, const int width, const int height) : 
 	}
 
 	iFile.close();
+}
+
+
+
+Matrix::Matrix(const Matrix& m, const int line, const int col)
+{
+	m_height = m.m_height - 1;
+	m_width = m.m_width - 1;
+
+	m_arr = new double* [m_height];
+	for (int i = 0; i < m_height; ++i)
+	{
+		m_arr[i] = new double[m_width];
+	}
+
+	for (int i = 0, i1 = 0; i < m.m_height; ++i)
+	{
+		if (line == i)
+		{
+			continue;
+		}
+		for (int j = 0, j1 = 0; j < m.m_width; ++j)
+		{
+			if (col == j)
+			{
+				continue;
+			}
+			m_arr[i1][j1] = m.m_arr[i][j];
+			++j1;
+		}
+		++i1;
+	}
 }
 
 
@@ -115,14 +133,11 @@ Matrix::Matrix(const Matrix& m)
 {
 	m_height = m.m_height;
 	m_width = m.m_width;
+
 	m_arr = new double* [m_height];
 	for (int i = 0; i < m_height; ++i)
 	{
 		m_arr[i] = new double[m_width];
-	}
-
-	for (int i = 0; i < m_height; ++i)
-	{
 		for (int j = 0; j < m_width; ++j)
 		{
 			m_arr[i][j] = m.m_arr[i][j];
@@ -156,13 +171,10 @@ Matrix& Matrix::operator= (const Matrix& m)
 	m_height = m.m_height;
 	m_width = m.m_width;
 	m_arr = new double* [m_height];
-	for (int i = 0; i < m_height; ++i)
-	{
-		m_arr[i] = new double[m_width];
-	}
 
 	for (int i = 0; i < m_height; ++i)
 	{
+		m_arr[i] = new double[m_width];
 		for (int j = 0; j < m_width; ++j)
 		{
 			m_arr[i][j] = m.m_arr[i][j];
@@ -311,6 +323,8 @@ std::ostream& operator<< (std::ostream& out, const Matrix& m)
 
 
 
+
+
 double& Matrix::operator() (const int line, const int col)
 {
 	if (line >= m_height)
@@ -328,7 +342,7 @@ double& Matrix::operator() (const int line, const int col)
 
 
 
-Matrix Matrix::changeOneColumn(const Matrix& col, const int numCol)
+Matrix Matrix::changeOneColumn(const Matrix& col, const int numCol) const
 {
 	if (numCol >= m_width)
 	{
@@ -341,11 +355,93 @@ Matrix Matrix::changeOneColumn(const Matrix& col, const int numCol)
 	Matrix temp(*this);
 	for (int i = 0; i < m_height; ++i)
 	{
-		temp.m_arr[i][numCol] = col.m_arr[i][numCol];
+		temp.m_arr[i][numCol] = col.m_arr[i][0];
 	}
+	std::cout << temp << std::endl;
 	return temp;
 }
 
+
+
+
+
+
+
+
+int pow(const int b)
+{
+	int a = 1;
+	for (int i = 0; i < b; ++i)
+	{
+		a *= -1;
+	}
+	return a;
+}
+
+
+
+
+double countDet(const Matrix& m)
+{
+	if (m.m_height != m.m_width)
+	{
+		throw("m.m_height != m.m_width");
+	}
+	if (m.m_height <= 2)
+	{
+		return (m.m_arr[0][0]*m.m_arr[1][1] - m.m_arr[0][1]*m.m_arr[1][0]);
+	}
+
+
+	double sum = 0;
+	for (int i = 0; i < m.m_height; ++i)
+	{
+		Matrix temp(m, i, 0);
+		sum += pow(i) * countDet(temp) * m.m_arr[i][0];
+	}
+	return sum;
+
+}
+
+
+
+
+
+Matrix solveSLAE(const Matrix& a, const Matrix& b)
+{
+	if (a.m_height != a.m_width)
+	{
+		throw("a.m_height != a.m_width");
+	}
+	if (a.m_height != b.m_height)
+	{
+		throw("a.m_height != b.m_height");
+	}
+	double det = countDet(a);
+	if (det == 0)
+	{
+		throw("det == 0");
+	}
+
+	double *temp = nullptr;
+	temp = new double[a.m_height];
+
+
+	for (int i = 0; i < a.m_height; ++i)
+	{
+		temp[i] = countDet(a.changeOneColumn(b, i));
+	}
+	
+	Matrix result(a.m_height, 1);
+	for (int i = 0; i < a.m_height; ++i)
+	{
+		result(i, 0) = temp[i] / det;
+	}
+
+	delete[] temp;
+
+	return result;
+}
 
 
 

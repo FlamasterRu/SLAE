@@ -25,8 +25,9 @@ public:
 	static Log& createLog();
 	static void deleteLog();
 
+	template <typename T>
+	friend Log& operator<< (Log& log,const T str);
 
-	friend Log& operator<< (Log& log, const std::string str);
 	void writeLog(const std::string str);
 	void clearFile();
 
@@ -35,8 +36,12 @@ public:
 
 
 
-
-
+template <typename T>
+Log& operator<< (Log& log, const T str)
+{
+	log.l_file << str;
+	return log;
+}
 
 
 

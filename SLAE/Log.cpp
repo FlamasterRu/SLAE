@@ -86,11 +86,11 @@ void Log::clearFile()
 
 
 
-Log& operator<< (Log& log, const std::string str)
-{
-	log.l_file << str;
-	return log;
-}
+//Log& operator<< (Log& log, const std::string str)
+//{
+//	log.l_file << str;
+//	return log;
+//}
 
 
 
