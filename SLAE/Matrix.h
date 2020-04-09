@@ -8,6 +8,8 @@
 
 int pow(const int b);
 
+void createRandMatrix(const int height, const int width, std::string fileName);
+
 
 
 class Matrix
@@ -39,12 +41,12 @@ public:
 	friend std::ostream& operator<< (std::ostream& out, const Matrix& m);		//+++++
 	double& operator() (const int line, const int col);		//+++++
 
-	Matrix changeOneColumn(const Matrix& col, const int numCol) const;
+	Matrix changeOneColumn(const Matrix& col, const int numCol) const;		//+++++
 
 
-	friend double countDet(const Matrix& m);		//+++++--
+	friend double countDet(const Matrix& m);		//+++++-----
 
-	friend Matrix solveSLAE(const Matrix& a, const Matrix& b);
+	friend Matrix solveSLAE(const Matrix& a, const Matrix& b);		//+++++
 
 };
 

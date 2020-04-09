@@ -1,6 +1,97 @@
 ﻿#include <iostream>
 #include "Log.h"
 #include "Matrix.h"
+#include <omp.h>
+#include <ctime>
+#include <chrono>
+
+
+
+
+void test()
+{
+	Log& log = Log::createLog();
+
+	Matrix A3("A3.txt");
+	Matrix A4("A4.txt");
+	Matrix A5("A5.txt");
+	Matrix A6("A6.txt");
+	Matrix A7("A7.txt");
+	Matrix A8("A8.txt");
+	Matrix A9("A9.txt");
+	Matrix A10("A10.txt");
+	Matrix A11("A11.txt");
+	Matrix b3("b3.txt");
+	Matrix b4("b4.txt");
+	Matrix b5("b5.txt");
+	Matrix b6("b6.txt");
+	Matrix b7("b7.txt");
+	Matrix b8("b8.txt");
+	Matrix b9("b9.txt");
+	Matrix b10("b10.txt");
+	Matrix b11("b11.txt");
+
+	std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+	std::chrono::duration<double> sec = end - start;
+
+	start = std::chrono::system_clock::now();
+	solveSLAE(A3, b3);
+	end = std::chrono::system_clock::now();
+	sec = end - start;
+	log << "Size 3:  " << sec.count() << " Sec" << '\n';
+
+	start = std::chrono::system_clock::now();
+	solveSLAE(A4, b4);
+	end = std::chrono::system_clock::now();
+	sec = end - start;
+	log << "Size 4:  " << sec.count() << " Sec" << '\n';
+
+	start = std::chrono::system_clock::now();
+	solveSLAE(A5, b5);
+	end = std::chrono::system_clock::now();
+	sec = end - start;
+	log << "Size 5:  " << sec.count() << " Sec" << '\n';
+
+	start = std::chrono::system_clock::now();
+	solveSLAE(A6, b6);
+	end = std::chrono::system_clock::now();
+	sec = end - start;
+	log << "Size 6:  " << sec.count() << " Sec" << '\n';
+
+	start = std::chrono::system_clock::now();
+	solveSLAE(A7, b7);
+	end = std::chrono::system_clock::now();
+	sec = end - start;
+	log << "Size 7:  " << sec.count() << " Sec" << '\n';
+
+	start = std::chrono::system_clock::now();
+	solveSLAE(A8, b8);
+	end = std::chrono::system_clock::now();
+	sec = end - start;
+	log << "Size 8:  " << sec.count() << " Sec" << '\n';
+
+	start = std::chrono::system_clock::now();
+	solveSLAE(A9, b9);
+	end = std::chrono::system_clock::now();
+	sec = end - start;
+	log << "Size 9:  " << sec.count() << " Sec" << '\n';
+
+	start = std::chrono::system_clock::now();
+	solveSLAE(A10, b10);
+	end = std::chrono::system_clock::now();
+	sec = end - start;
+	log << "Size 10:  " << sec.count() << " Sec" << '\n';
+
+	start = std::chrono::system_clock::now();
+	solveSLAE(A11, b11);
+	end = std::chrono::system_clock::now();
+	sec = end - start;
+	log << "Size 11:  " << sec.count() << " Sec" << '\n';
+
+
+	Log::deleteLog();
+}
 
 
 
@@ -14,77 +105,5 @@
 
 int main()
 {
-	Log &log = Log::createLog();
-	Matrix A1("A1.txt");
-	Matrix A2("A2.txt");
-	Matrix A3("A3.txt");
-	Matrix b3("b3.txt");
-	Matrix m1("m1.txt");
-	Matrix m2("m2.txt");
-	Matrix m3("m3.txt");
-
-	//std::cout << A1 << std::endl << A2 << std::endl << A3 << std::endl << b3 << std::endl << m1 << std::endl << m2 << std::endl << m3 << std::endl;
-
-	//std::ofstream oFile;
-	//oFile.open("out.txt");
-	//oFile << m1;
-	//oFile.close();
-
-	//Matrix t;
-	//std::cout << A3 << std::endl;
-	//t = A3.changeOneColumn(b3, 2);
-	//std::cout << A3 << std::endl;
-	//std::cout << t << std::endl;
-
-	//log << A1 << countDet(A1) << "\n";
-	//log << A2 << countDet(A2) << "\n";
-
-	Matrix t;
-
-	std::cout << A3 << std::endl;
-	std::cout << b3 << std::endl;
-
-	t = solveSLAE(A3, b3);
-
-	std::cout << t << std::endl;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	Log::deleteLog();
+	test();
 }

@@ -1,5 +1,6 @@
 #include "Matrix.h"
 #include <fstream>
+#include <ctime>
 
 
 
@@ -357,7 +358,6 @@ Matrix Matrix::changeOneColumn(const Matrix& col, const int numCol) const
 	{
 		temp.m_arr[i][numCol] = col.m_arr[i][0];
 	}
-	std::cout << temp << std::endl;
 	return temp;
 }
 
@@ -430,6 +430,7 @@ Matrix solveSLAE(const Matrix& a, const Matrix& b)
 	for (int i = 0; i < a.m_height; ++i)
 	{
 		temp[i] = countDet(a.changeOneColumn(b, i));
+		//std::cout << "          " << i << " == " << temp[i] << std::endl;
 	}
 	
 	Matrix result(a.m_height, 1);
@@ -445,6 +446,35 @@ Matrix solveSLAE(const Matrix& a, const Matrix& b)
 
 
 
+
+
+
+void createRandMatrix(const int height, const int width, std::string fileName)
+{
+	std::ofstream oFile;
+	oFile.open(fileName);
+	if (!oFile.is_open())
+	{
+		throw("Can't open file");
+	}
+	srand(time(0));
+	oFile << height << " " << width << std::endl;
+	for (int i = 0; i < height; ++i)
+	{
+		for (int j = 0; j < width; ++j)
+		{
+			if (j == width - 1)
+			{
+				oFile << (rand() % 60 - 30);
+			}
+			else
+			{
+				oFile << (rand() % 60 - 30) << " ";
+			}
+		}
+		oFile << std::endl;
+	}
+}
 
 
 
