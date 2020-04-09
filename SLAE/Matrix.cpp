@@ -387,9 +387,18 @@ double countDet(const Matrix& m)
 	{
 		throw("m.m_height != m.m_width");
 	}
-	if (m.m_height <= 2)
+	if (m.m_height == 1)
+	{
+		return m.m_arr[0][0];
+	}
+	if (m.m_height == 2)
 	{
 		return (m.m_arr[0][0]*m.m_arr[1][1] - m.m_arr[0][1]*m.m_arr[1][0]);
+	}
+	if (m.m_height == 3)
+	{
+		return (m.m_arr[0][0] * m.m_arr[1][1] * m.m_arr[2][2] + m.m_arr[0][1] * m.m_arr[1][2] * m.m_arr[2][0] + m.m_arr[1][0] * m.m_arr[2][1] * m.m_arr[0][2]
+			- m.m_arr[0][2] * m.m_arr[1][1] * m.m_arr[2][0] - m.m_arr[0][0] * m.m_arr[2][1] * m.m_arr[1][2] - m.m_arr[2][2] * m.m_arr[0][1] * m.m_arr[1][0]);
 	}
 
 

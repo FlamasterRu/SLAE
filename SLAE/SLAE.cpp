@@ -189,5 +189,5 @@ void testCout()
 
 int main()
 {
-	testCout();
+	testLog();
 }
