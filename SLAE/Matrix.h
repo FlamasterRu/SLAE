@@ -44,7 +44,7 @@ public:
 	Matrix changeOneColumn(const Matrix& col, const int numCol) const;		//+++++
 
 
-	friend double countDet(const Matrix& m);		//+++++-----
+	friend double countDet(const Matrix& m);		//+++++
 
 	friend Matrix solveSLAE(const Matrix& a, const Matrix& b);		//+++++
 
