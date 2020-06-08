@@ -20,22 +20,6 @@ Matrix::Matrix(const int height, const int width) : m_width(width), m_height(hei
 
 
 
-
-Matrix::Matrix(const double** arr, const int height, const int width) : m_width(width), m_height(height)
-{
-	m_arr = new double* [m_height];
-	for (int i = 0; i < m_height; ++i)
-	{
-		m_arr[i] = new double[m_width];
-		for (int j = 0; j < m_width; ++j)
-		{
-			m_arr[i][j] = arr[i][j];
-		}
-	}
-}
-
-
-
 Matrix::Matrix(const std::string fileName) 
 {
 	std::ifstream iFile;
@@ -58,7 +42,6 @@ Matrix::Matrix(const std::string fileName)
 
 	iFile.close();
 }
-
 
 
 
@@ -118,14 +101,16 @@ Matrix::Matrix(const Matrix& m, const int line, const int col)
 
 
 
-
 Matrix::~Matrix()
 {
-	for (int i = 0; i < m_height; ++i)
+	if (m_arr != nullptr)
 	{
-		delete[] m_arr[i];
+		for (int i = 0; i < m_height; ++i)
+		{
+			delete[] m_arr[i];
+		}
+		delete[] m_arr;
 	}
-	delete[] m_arr;
 }
 
 
@@ -148,12 +133,13 @@ Matrix::Matrix(const Matrix& m)
 
 
 
-
-
-
-
-
-
+Matrix::Matrix(Matrix&& m)
+{
+	m_height = m.m_height;
+	m_width = m.m_width;
+	m_arr = m.m_arr;
+	m.m_arr = nullptr;
+}
 
 
 
@@ -186,118 +172,17 @@ Matrix& Matrix::operator= (const Matrix& m)
 
 
 
-
-
-Matrix operator+ (const Matrix& left, const Matrix& right)
+Matrix& Matrix::operator= (Matrix&& m)
 {
-	if (left.m_height != right.m_height)
-	{
-		throw("Can't sum matrix with different height");
+	if (this == &m) {
+		return *this;
 	}
-	if (left.m_width != right.m_width)
-	{
-		throw("Can't sum matrix with different width");
-	}
-
-	Matrix temp(left);
-
-	for (int i = 0; i < temp.m_height; ++i)
-	{
-		for (int j = 0; j < temp.m_width; ++j)
-		{
-			temp.m_arr[i][j] += right.m_arr[i][j];
-		}
-	}
-
-	return temp;
-}
-
-
-
-
-bool operator== (const Matrix& left, const Matrix& right)
-{
-	if (left.m_height != right.m_height)
-	{
-		return 0;
-	}
-	if (left.m_width != right.m_width)
-	{
-		return 0;
-	}
-	for (int i = 0; i < left.m_height; ++i)
-	{
-		for (int j = 0; j < left.m_width; ++j)
-		{
-			if (left.m_arr[i][j] != right.m_arr[i][j])
-			{
-				return 0;
-			}
-		}
-	}
-	return 1;
-}
-
-
-
-
-Matrix& Matrix::operator+= (const Matrix& m)
-{
-	if (m_height != m.m_height)
-	{
-		throw("Can't sum matrix with different height");
-	}
-	if (m_width != m.m_width)
-	{
-		throw("Can't sum matrix with different width");
-	}
-	for (int i = 0; i < m_height; ++i)
-	{
-		for (int j = 0; j < m_width; ++j)
-		{
-			m_arr[i][j] += m.m_arr[i][j];
-		}
-	}
+	m_height = m.m_height;
+	m_width = m.m_width;
+	m_arr = m.m_arr;
+	m.m_arr = nullptr;
 	return *this;
 }
-
-
-
-
-Matrix& Matrix::operator- ()
-{
-	for (int i = 0; i < m_height; ++i)
-	{
-		for (int j = 0; j < m_width; ++j)
-		{
-			m_arr[i][j] *= -1;
-		}
-	}
-	return *this;
-}
-
-
-Matrix& Matrix::operator-= (const Matrix& m)
-{
-	if (m_height != m.m_height)
-	{
-		throw("Can't subtract matrix with different height");
-	}
-	if (m_width != m.m_width)
-	{
-		throw("Can't subtract matrix with different width");
-	}
-	for (int i = 0; i < m_height; ++i)
-	{
-		for (int j = 0; j < m_width; ++j)
-		{
-			m_arr[i][j] -= m.m_arr[i][j];
-		}
-	}
-	return *this;
-}
-
-
 
 
 
@@ -324,8 +209,6 @@ std::ostream& operator<< (std::ostream& out, const Matrix& m)
 
 
 
-
-
 double& Matrix::operator() (const int line, const int col)
 {
 	if (line >= m_height)
@@ -338,8 +221,6 @@ double& Matrix::operator() (const int line, const int col)
 	}
 	return m_arr[line][col];
 }
-
-
 
 
 
@@ -363,11 +244,6 @@ Matrix Matrix::changeOneColumn(const Matrix& col, const int numCol) const
 
 
 
-
-
-
-
-
 int pow(const int b)
 {
 	int a = 1;
@@ -377,7 +253,6 @@ int pow(const int b)
 	}
 	return a;
 }
-
 
 
 
@@ -403,16 +278,15 @@ double countDet(const Matrix& m)
 
 
 	double sum = 0;
+
 	for (int i = 0; i < m.m_height; ++i)
 	{
 		Matrix temp(m, i, 0);
 		sum += pow(i) * countDet(temp) * m.m_arr[i][0];
 	}
+
 	return sum;
-
 }
-
-
 
 
 
@@ -432,12 +306,13 @@ Matrix solveSLAE(const Matrix& a, const Matrix& b)
 		throw("det == 0");
 	}
 
-	double *temp = nullptr;
+	double* temp = nullptr;
 	temp = new double[a.m_height];
 
 
 	for (int i = 0; i < a.m_height; ++i)
 	{
+		//std::cout << "start: " << i << std::endl;
 		temp[i] = countDet(a.changeOneColumn(b, i));
 		//std::cout << "          " << i << " == " << temp[i] << std::endl;
 	}
@@ -452,9 +327,6 @@ Matrix solveSLAE(const Matrix& a, const Matrix& b)
 
 	return result;
 }
-
-
-
 
 
 
@@ -484,6 +356,10 @@ void createRandMatrix(const int height, const int width, std::string fileName)
 		oFile << std::endl;
 	}
 }
+
+
+
+
 
 
 

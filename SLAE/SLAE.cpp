@@ -1,7 +1,6 @@
 ﻿#include <iostream>
 #include "Log.h"
 #include "Matrix.h"
-#include <omp.h>
 #include <ctime>
 #include <chrono>
 
@@ -88,7 +87,6 @@ void testLog()
 	end = std::chrono::system_clock::now();
 	sec = end - start;
 	log << "Size 11:  " << sec.count() << " Sec" << '\n';
-
 
 	Log::deleteLog();
 }
