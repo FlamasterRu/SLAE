@@ -88,7 +88,6 @@ void testLog()
 	sec = end - start;
 	log << "Size 11:  " << sec.count() << " Sec" << '\n';
 
-	Log::deleteLog();
 }
 
 
@@ -119,7 +118,7 @@ void testCout()
 	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
 	std::chrono::duration<double> sec = end - start;
 
-	start = std::chrono::system_clock::now();
+	/*start = std::chrono::system_clock::now();
 	solveSLAE(A3, b3);
 	end = std::chrono::system_clock::now();
 	sec = end - start;
@@ -159,7 +158,7 @@ void testCout()
 	solveSLAE(A9, b9);
 	end = std::chrono::system_clock::now();
 	sec = end - start;
-	std::cout << "Size 9:  " << sec.count() << " Sec" << '\n';
+	std::cout << "Size 9:  " << sec.count() << " Sec" << '\n';*/
 
 	start = std::chrono::system_clock::now();
 	solveSLAE(A10, b10);
@@ -167,11 +166,11 @@ void testCout()
 	sec = end - start;
 	std::cout << "Size 10:  " << sec.count() << " Sec" << '\n';
 
-	start = std::chrono::system_clock::now();
+	/*start = std::chrono::system_clock::now();
 	solveSLAE(A11, b11);
 	end = std::chrono::system_clock::now();
 	sec = end - start;
-	std::cout << "Size 11:  " << sec.count() << " Sec" << '\n';
+	std::cout << "Size 11:  " << sec.count() << " Sec" << '\n';*/
 
 }
 
@@ -187,5 +186,5 @@ void testCout()
 
 int main()
 {
-	testLog();
+	testCout();
 }

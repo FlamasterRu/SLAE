@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <mutex>
 
 
 
@@ -20,20 +21,23 @@ private:
 	int m_height;
 
 
+
 public:
+
+	static std::mutex mtx;
 
 	Matrix(const int width = 1, const int height = 1);		//+++++
 	Matrix(const std::string fileName);		//+++++
 	Matrix(const std::string fileName, const int width, const int height);		//+++++
 	Matrix(const Matrix& m);		//+++++
 	Matrix(const Matrix& m, const int line, const int col);		//+++++
-	Matrix(Matrix&& m);		//
+	Matrix(Matrix&& m) noexcept; 		//
 
 	~Matrix();
 
 
 	Matrix& operator= (const Matrix& m);		//+++++
-	Matrix& operator= (Matrix&& m);		//
+	Matrix& operator= (Matrix&& m) noexcept;		//
 	friend std::ostream& operator<< (std::ostream& out, const Matrix& m);		//+++++
 	double& operator() (const int line, const int col);		//+++++
 

@@ -23,7 +23,7 @@ public:
 
 
 	static Log& createLog();
-	static void deleteLog();
+	//static void deleteLog();
 
 	template <typename T>
 	friend Log& operator<< (Log& log,const T str);
@@ -39,8 +39,15 @@ public:
 template <typename T>
 Log& operator<< (Log& log, const T str)
 {
-	log.l_file << str;
-	return log;
+	if (Log::l_ptr != nullptr)
+	{
+		log.l_file << str;
+		return log;
+	}
+	else
+	{
+		std::cout << "Log was deleted" << std::endl;
+	}
 }
 
 

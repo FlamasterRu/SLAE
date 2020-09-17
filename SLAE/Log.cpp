@@ -28,10 +28,15 @@ Log::Log()
 
 Log::~Log()
 {
-	if (l_file.is_open())
+	if (l_ptr != nullptr)
 	{
-		l_file << std::endl << "------------------------------------------------------" << std::endl << std::endl;
-		l_file.close();
+		if (l_file.is_open())
+		{
+			l_file << std::endl << "------------------------------------------------------" << std::endl << std::endl;
+			l_file.close();
+		}
+		delete l_ptr;
+		l_ptr = nullptr;
 	}
 }
 
@@ -52,14 +57,14 @@ Log& Log::createLog()
 }
 
 
-void Log::deleteLog()
-{
-	if (l_ptr != nullptr)
-	{
-		delete l_ptr;
-		l_ptr = nullptr;
-	}
-}
+//void Log::deleteLog()
+//{
+//	if (l_ptr != nullptr)
+//	{
+//		delete l_ptr;
+//		l_ptr = nullptr;
+//	}
+//}
 
 
 
@@ -81,50 +86,6 @@ void Log::clearFile()
 		throw("Log can't create");
 	}
 }
-
-
-
-
-
-//Log& operator<< (Log& log, const std::string str)
-//{
-//	log.l_file << str;
-//	return log;
-//}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

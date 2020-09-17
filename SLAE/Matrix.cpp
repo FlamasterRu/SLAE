@@ -1,7 +1,11 @@
 #include "Matrix.h"
 #include <fstream>
 #include <ctime>
+#include <thread>
+#include <vector>
+#include <queue>
 
+std::mutex Matrix::mtx;
 
 
 
@@ -22,6 +26,7 @@ Matrix::Matrix(const int height, const int width) : m_width(width), m_height(hei
 
 Matrix::Matrix(const std::string fileName) 
 {
+	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	std::ifstream iFile;
 	iFile.open(fileName);
 	if (!iFile.is_open())
@@ -71,6 +76,7 @@ Matrix::Matrix(const std::string fileName, const int height, const int width) : 
 
 Matrix::Matrix(const Matrix& m, const int line, const int col)
 {
+	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	m_height = m.m_height - 1;
 	m_width = m.m_width - 1;
 
@@ -117,6 +123,7 @@ Matrix::~Matrix()
 
 Matrix::Matrix(const Matrix& m)
 {
+	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	m_height = m.m_height;
 	m_width = m.m_width;
 
@@ -129,23 +136,27 @@ Matrix::Matrix(const Matrix& m)
 			m_arr[i][j] = m.m_arr[i][j];
 		}
 	}
+	std::cout << "Copy " << std::this_thread::get_id() << std::endl;
 }
 
 
 
-Matrix::Matrix(Matrix&& m)
+Matrix::Matrix(Matrix&& m) noexcept
 {
+	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	m_height = m.m_height;
 	m_width = m.m_width;
 	m_arr = m.m_arr;
 	m.m_arr = nullptr;
+	std::cout << "Move " << std::this_thread::get_id() << std::endl;
 }
 
 
 
 Matrix& Matrix::operator= (const Matrix& m)
 {
-	if (this == &m) {
+	if (this == &m) 
+	{
 		return *this;
 	}
 
@@ -172,9 +183,11 @@ Matrix& Matrix::operator= (const Matrix& m)
 
 
 
-Matrix& Matrix::operator= (Matrix&& m)
+Matrix& Matrix::operator= (Matrix&& m) noexcept 
 {
-	if (this == &m) {
+	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
+	if (this == &m) 
+	{
 		return *this;
 	}
 	m_height = m.m_height;
@@ -188,6 +201,7 @@ Matrix& Matrix::operator= (Matrix&& m)
 
 std::ostream& operator<< (std::ostream& out, const Matrix& m)
 {
+	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	out << m.m_height << " " << m.m_width << std::endl;
 	for (int i = 0; i < m.m_height; ++i)
 	{
@@ -211,6 +225,7 @@ std::ostream& operator<< (std::ostream& out, const Matrix& m)
 
 double& Matrix::operator() (const int line, const int col)
 {
+	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	if (line >= m_height)
 	{
 		throw("Line access error");
@@ -226,6 +241,7 @@ double& Matrix::operator() (const int line, const int col)
 
 Matrix Matrix::changeOneColumn(const Matrix& col, const int numCol) const
 {
+	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	if (numCol >= m_width)
 	{
 		throw("Column access error");
@@ -246,6 +262,7 @@ Matrix Matrix::changeOneColumn(const Matrix& col, const int numCol) const
 
 int pow(const int b)
 {
+	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	int a = 1;
 	for (int i = 0; i < b; ++i)
 	{
@@ -309,17 +326,54 @@ Matrix solveSLAE(const Matrix& a, const Matrix& b)
 	double* temp = nullptr;
 	temp = new double[a.m_height];
 
+	unsigned int cores = std::thread::hardware_concurrency();
+	
 
+	std::queue<std::thread> threads;
+	std::queue<int> qu;
+
+	auto f = [&temp, &a, &b](int i) 
+	{
+		std::unique_lock<std::mutex> l(Matrix::mtx);
+		std::cout << "start: " << i << std::this_thread::get_id() << std::endl;
+		Matrix changedMatrix(a.changeOneColumn(b, i));
+		l.unlock();
+		temp[i] = countDet(std::move(changedMatrix));
+		l.lock();
+		std::cout << "end: " << i << std::this_thread::get_id() << std::endl;
+		l.unlock();
+		
+	};
+
+
+	std::cout << "			this thread   " << std::this_thread::get_id() << std::endl;
 	for (int i = 0; i < a.m_height; ++i)
 	{
-		//std::cout << "start: " << i << std::endl;
-		temp[i] = countDet(a.changeOneColumn(b, i));
-		//std::cout << "          " << i << " == " << temp[i] << std::endl;
+		threads.push(std::thread(f, i));
+		qu.push(i);
+		if ((qu.size() >= 1) or (i == a.m_height - 1))			////////////// qu.size() >= 1 число отвечает за одновременно работающее количество потоков
+		{
+			while (qu.size() > 0)
+			{
+				threads.front().join();
+				threads.pop();
+				qu.pop();
+			}
+		}
 	}
+
+	//for (int i = 0; i < a.m_height; ++i)
+	//{
+
+	//	//std::cout << "start: " << i << std::endl;
+	//	temp[i] = countDet(a.changeOneColumn(b, i));
+	//	//std::cout << "          " << i << " == " << temp[i] << std::endl;
+	//}
 	
 	Matrix result(a.m_height, 1);
 	for (int i = 0; i < a.m_height; ++i)
 	{
+		//threads[i].join();
 		result(i, 0) = temp[i] / det;
 	}
 
