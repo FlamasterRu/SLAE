@@ -7,9 +7,10 @@
 
 
 
-int pow(const int b);
+int pow(const int b);		// возвращает +1 или -1 для расчёта определителя матрицы
 
-void createRandMatrix(const int height, const int width, std::string fileName);
+void createRandMatrix(const int height, const int width, std::string fileName);		// создаёт матрицу со случайными значениями от -30 до +30 и записывает в файл,
+// который помещается в ту же папку, что и проект
 
 
 
@@ -26,33 +27,36 @@ public:
 
 	static std::mutex mtx;
 
-	Matrix(const int width = 1, const int height = 1);		//+++++
-	Matrix(const std::string fileName);		//+++++
-	Matrix(const std::string fileName, const int width, const int height);		//+++++
-	Matrix(const Matrix& m);		//+++++
-	Matrix(const Matrix& m, const int line, const int col);		//+++++
-	Matrix(Matrix&& m) noexcept; 		//
+	Matrix(const int width = 1, const int height = 1);
+	Matrix(const std::string fileName);
+	Matrix(const std::string fileName, const int width, const int height);
+	Matrix(const Matrix& m);
+	Matrix(const Matrix& m, const int line, const int col);
+	Matrix(Matrix&& m) noexcept;
 
 	~Matrix();
 
 
-	Matrix& operator= (const Matrix& m);		//+++++
-	Matrix& operator= (Matrix&& m) noexcept;		//
-	friend std::ostream& operator<< (std::ostream& out, const Matrix& m);		//+++++
-	double& operator() (const int line, const int col);		//+++++
+	Matrix& operator= (const Matrix& m);
+	Matrix& operator= (Matrix&& m) noexcept;
+	friend std::ostream& operator<< (std::ostream& out, const Matrix& m);		// позволяет вывести матрицу в консоль через cout
+	double& operator() (const int line, const int col);
 
 
-	Matrix changeOneColumn(const Matrix& col, const int numCol) const;		//+++++
+	Matrix changeOneColumn(const Matrix& col, const int numCol) const;			// возвращает матрицу, в которой заменён столбец с номером numCol
+	int getHeight();
+	int getWidth();
 
 
-	friend double countDet(const Matrix& m);		//+++++
-	friend Matrix solveSLAE(const Matrix& a, const Matrix& b);		//+++++
+	friend double countDet(const Matrix& m);		// рассчитывает определитель, всё в одном потоке
+	friend Matrix solveSLAE(const Matrix& a, const Matrix& b);		// возвращает решение слау, использует многопоточность
 
 };
 
 
+Matrix createRandMatrix(const int height, const int width);		// возвращает матрицу со случайными значениями от -20 до +20, работает минимум 1 секунду!
 
-
+bool checkSolution(Matrix& A, Matrix& b, Matrix& x);		// проверяет решение слау
 
 
 

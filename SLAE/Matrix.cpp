@@ -2,8 +2,9 @@
 #include <fstream>
 #include <ctime>
 #include <thread>
-#include <vector>
 #include <queue>
+#include <future>
+
 
 std::mutex Matrix::mtx;
 
@@ -26,13 +27,13 @@ Matrix::Matrix(const int height, const int width) : m_width(width), m_height(hei
 
 Matrix::Matrix(const std::string fileName) 
 {
-	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	std::ifstream iFile;
 	iFile.open(fileName);
 	if (!iFile.is_open())
 	{
 		throw("Can't open file");
 	}
+
 	iFile >> m_height >> m_width;
 
 	m_arr = new double* [m_height];
@@ -76,7 +77,6 @@ Matrix::Matrix(const std::string fileName, const int height, const int width) : 
 
 Matrix::Matrix(const Matrix& m, const int line, const int col)
 {
-	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	m_height = m.m_height - 1;
 	m_width = m.m_width - 1;
 
@@ -123,7 +123,6 @@ Matrix::~Matrix()
 
 Matrix::Matrix(const Matrix& m)
 {
-	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	m_height = m.m_height;
 	m_width = m.m_width;
 
@@ -136,19 +135,16 @@ Matrix::Matrix(const Matrix& m)
 			m_arr[i][j] = m.m_arr[i][j];
 		}
 	}
-	std::cout << "Copy " << std::this_thread::get_id() << std::endl;
 }
 
 
 
 Matrix::Matrix(Matrix&& m) noexcept
 {
-	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	m_height = m.m_height;
 	m_width = m.m_width;
 	m_arr = m.m_arr;
 	m.m_arr = nullptr;
-	std::cout << "Move " << std::this_thread::get_id() << std::endl;
 }
 
 
@@ -185,7 +181,6 @@ Matrix& Matrix::operator= (const Matrix& m)
 
 Matrix& Matrix::operator= (Matrix&& m) noexcept 
 {
-	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	if (this == &m) 
 	{
 		return *this;
@@ -201,12 +196,11 @@ Matrix& Matrix::operator= (Matrix&& m) noexcept
 
 std::ostream& operator<< (std::ostream& out, const Matrix& m)
 {
-	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
-	out << m.m_height << " " << m.m_width << std::endl;
 	for (int i = 0; i < m.m_height; ++i)
 	{
 		for (int j = 0; j < m.m_width; ++j)
 		{
+			out.width(4);
 			if (j == m.m_width - 1)
 			{
 				out << m.m_arr[i][j];
@@ -225,7 +219,6 @@ std::ostream& operator<< (std::ostream& out, const Matrix& m)
 
 double& Matrix::operator() (const int line, const int col)
 {
-	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	if (line >= m_height)
 	{
 		throw("Line access error");
@@ -241,7 +234,6 @@ double& Matrix::operator() (const int line, const int col)
 
 Matrix Matrix::changeOneColumn(const Matrix& col, const int numCol) const
 {
-	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	if (numCol >= m_width)
 	{
 		throw("Column access error");
@@ -250,6 +242,7 @@ Matrix Matrix::changeOneColumn(const Matrix& col, const int numCol) const
 	{
 		throw("Line access error");
 	}
+
 	Matrix temp(*this);
 	for (int i = 0; i < m_height; ++i)
 	{
@@ -262,7 +255,6 @@ Matrix Matrix::changeOneColumn(const Matrix& col, const int numCol) const
 
 int pow(const int b)
 {
-	//std::unique_lock<std::mutex> l(Matrix::mtx, std::try_to_lock);
 	int a = 1;
 	for (int i = 0; i < b; ++i)
 	{
@@ -317,42 +309,40 @@ Matrix solveSLAE(const Matrix& a, const Matrix& b)
 	{
 		throw("a.m_height != b.m_height");
 	}
-	double det = countDet(a);
-	if (det == 0)
-	{
-		throw("det == 0");
-	}
+
+	auto futureDet = std::async(std::launch::async, countDet, a);
 
 	double* temp = nullptr;
 	temp = new double[a.m_height];
 
 	unsigned int cores = std::thread::hardware_concurrency();
-	
-
+	if (cores <= 2)
+	{
+		cores = 3;    // костыль маленький, на случай одно или двухядерных пк
+	}
 	std::queue<std::thread> threads;
 	std::queue<int> qu;
 
 	auto f = [&temp, &a, &b](int i) 
 	{
 		std::unique_lock<std::mutex> l(Matrix::mtx);
-		std::cout << "start: " << i << std::this_thread::get_id() << std::endl;
 		Matrix changedMatrix(a.changeOneColumn(b, i));
 		l.unlock();
-		temp[i] = countDet(std::move(changedMatrix));
-		l.lock();
-		std::cout << "end: " << i << std::this_thread::get_id() << std::endl;
-		l.unlock();
-		
+		temp[i] = countDet(std::move(changedMatrix));		
 	};
 
 
-	std::cout << "			this thread   " << std::this_thread::get_id() << std::endl;
 	for (int i = 0; i < a.m_height; ++i)
 	{
 		threads.push(std::thread(f, i));
 		qu.push(i);
-		if ((qu.size() >= 1) or (i == a.m_height - 1))			////////////// qu.size() >= 1 число отвечает за одновременно работающее количество потоков
+		if ((qu.size() >= cores - 2) or (i == a.m_height - 1))			////////////// qu.size() >= cores - 2 отвечает за одновременно работающее количество потоков
 		{
+			if (i < a.m_height - 1)
+			{
+				++i;
+				f(i);		// запуск части задачи на основном потоке
+			}
 			while (qu.size() > 0)
 			{
 				threads.front().join();
@@ -362,18 +352,16 @@ Matrix solveSLAE(const Matrix& a, const Matrix& b)
 		}
 	}
 
-	//for (int i = 0; i < a.m_height; ++i)
-	//{
 
-	//	//std::cout << "start: " << i << std::endl;
-	//	temp[i] = countDet(a.changeOneColumn(b, i));
-	//	//std::cout << "          " << i << " == " << temp[i] << std::endl;
-	//}
-	
+	double det = futureDet.get();
+	if (det == 0)
+	{
+		throw("det == 0");
+	}
+
 	Matrix result(a.m_height, 1);
 	for (int i = 0; i < a.m_height; ++i)
 	{
-		//threads[i].join();
 		result(i, 0) = temp[i] / det;
 	}
 
@@ -392,6 +380,7 @@ void createRandMatrix(const int height, const int width, std::string fileName)
 	{
 		throw("Can't open file");
 	}
+
 	srand(time(0));
 	oFile << height << " " << width << std::endl;
 	for (int i = 0; i < height; ++i)
@@ -412,10 +401,66 @@ void createRandMatrix(const int height, const int width, std::string fileName)
 }
 
 
+int Matrix::getHeight()
+{
+	return this->m_height;
+}
+
+
+int Matrix::getWidth()
+{
+	return this->m_width;
+}
+
+
+
+Matrix createRandMatrix(const int height, const int width)
+{
+	srand(time(0) + height + width);
+	Matrix temp(height, width);
+	for (int i = 0; i < height; ++i)
+	{
+		for (int j = 0; j < width; ++j)
+		{
+			temp(i, j) = rand() % 40 - 20;
+		}
+	}
+	std::this_thread::sleep_for(std::chrono::seconds(1));		// чтобы все матрицы не получились одинаковыми (для srand), если они подряд генерируются
+	return temp;
+}
 
 
 
 
+
+bool checkSolution(Matrix& A, Matrix& b, Matrix& x)
+{
+	if ((A.getWidth() != b.getHeight()) or (A.getHeight() != x.getHeight()))
+	{
+		throw ("((A.getWidth() != b.getHeight()) or (A.getHeight() != x.getHeight()))");
+	}
+	double error = 0;
+	for (int line = 0; line < A.getHeight(); ++line)
+	{
+		double sum = 0;
+		for (int col = 0; col < A.getWidth(); ++col)
+		{
+			sum += A(line, col) * x(col, 0);
+		}
+		error += sum - b(line, 0);
+	}
+
+	if ((error > 0.00000001) or (error < -0.00000001))		/// Допустимая погрешность
+	{
+		//std::cout << "False solution!  error = " << error << std::endl;
+		return 0;
+	}
+	else
+	{
+		//std::cout << "True solution.  error = " << error << std::endl;
+		return 1;
+	}
+}
 
 
 
