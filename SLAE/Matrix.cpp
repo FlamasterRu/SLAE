@@ -217,7 +217,7 @@ std::ostream& operator<< (std::ostream& out, const Matrix& m)
 
 
 
-double& Matrix::operator() (const int line, const int col)
+double& Matrix::operator() (const int line, const int col) const
 {
 	if (line >= m_height)
 	{
@@ -401,13 +401,13 @@ void createRandMatrix(const int height, const int width, std::string fileName)
 }
 
 
-int Matrix::getHeight()
+int Matrix::getHeight() const
 {
 	return this->m_height;
 }
 
 
-int Matrix::getWidth()
+int Matrix::getWidth() const
 {
 	return this->m_width;
 }
@@ -466,7 +466,56 @@ bool checkSolution(Matrix& A, Matrix& b, Matrix& x)
 
 
 
+// countDetThreads работает быстрее countDet с матрицами размера больше 9 (много времени уходит на создание потоков)
+double countDetThreads(const Matrix m)
+{
+	if (m.getHeight() != m.getWidth())
+	{
+		throw("m.getHeight() != m.getWidth()");
+	}
 
+	double result = 0;
+
+
+	auto f = [&m, &result](int i)
+	{
+		double sum = 0;
+
+		std::unique_lock<std::mutex> l(Matrix::mtx);
+		Matrix temp(m, i, 0);
+		l.unlock();
+
+		sum = countDet(temp);
+		l.lock();
+		result += sum * pow(i) * m(i, 0);
+		l.unlock();
+	};
+
+	unsigned int cores = std::thread::hardware_concurrency();
+	std::queue<int> qu;
+	std::queue<std::thread> threads;
+	for (int i = 0; i < m.getHeight(); ++i)
+	{
+		threads.push(std::thread(f, i));
+		qu.push(i);
+		if ((qu.size() >= cores - 2) or (i == m.getHeight() - 1))			////////////// qu.size() >= cores - 2 отвечает за одновременно работающее количество потоков
+		{
+			if (i < m.getHeight() - 1)
+			{
+				++i;
+				f(i);		// запуск части задачи на основном потоке
+			}
+			while (qu.size() > 0)
+			{
+				threads.front().join();
+				threads.pop();
+				qu.pop();
+			}
+		}
+	}
+
+	return result;
+}
 
 
 

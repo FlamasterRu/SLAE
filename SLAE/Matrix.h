@@ -40,12 +40,12 @@ public:
 	Matrix& operator= (const Matrix& m);
 	Matrix& operator= (Matrix&& m) noexcept;
 	friend std::ostream& operator<< (std::ostream& out, const Matrix& m);		// позволяет вывести матрицу в консоль через cout
-	double& operator() (const int line, const int col);
+	double& operator() (const int line, const int col) const;
 
 
 	Matrix changeOneColumn(const Matrix& col, const int numCol) const;			// возвращает матрицу, в которой заменён столбец с номером numCol
-	int getHeight();
-	int getWidth();
+	int getHeight() const;
+	int getWidth() const;
 
 
 	friend double countDet(const Matrix& m);		// рассчитывает определитель, всё в одном потоке
@@ -59,6 +59,8 @@ Matrix createRandMatrix(const int height, const int width);		// возвращает матри
 bool checkSolution(Matrix& A, Matrix& b, Matrix& x);		// проверяет решение слау
 
 
+
+double countDetThreads(const Matrix m);		// рассчитывает определитель используя многопоточность
 
 
 
