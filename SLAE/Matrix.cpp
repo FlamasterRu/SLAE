@@ -398,7 +398,7 @@ void createRandMatrix(const int height, const int width, std::string fileName)
 		}
 		oFile << std::endl;
 	}
-	oFile.close()
+	oFile.close();
 }
 
 
