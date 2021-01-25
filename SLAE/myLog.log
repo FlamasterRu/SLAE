@@ -28,6 +28,7 @@ Size 9:  1.10363 Sec
 Size 10:  11.6296 Sec
 Size 11:  140.652 Sec
 Теперь концец рекурсии - вычисление определителя матрицы 3*3 одной формулой
+Now the end of the recursion is the calculation of the determinant of the 3 * 3 matrix with one formula
 
 ------------------------------------------------------
 
@@ -42,6 +43,7 @@ Size 9:  1.10575 Sec
 Size 10:  11.6395 Sec
 Size 11:  140.869 Sec
 Добавлен конструктор перемещения 
+Added move constructor
 
 ------------------------------------------------------
 
@@ -58,6 +60,8 @@ Size 10:  1.62205 Sec
 Size 11:  19.7749 Sec
 Включен режим Release и используется два потока. В настройках проекта используется максимальная оптимизация.
 В режиме Debug многопоточность только замедляет выполнение программы, в Release всё работает как должно.
+Release mode is on and two threads are in use. Maximum optimization is used in the project settings.
+In Debug mode, multithreading only slows down the execution of the program, in Release everything works as it should.
 
 ------------------------------------------------------
 
@@ -74,6 +78,7 @@ Size 9:  0.0715384
 Size 10:  0.719285
 Size 11:  9.94995
 Включен режим Release и используется 10 потоков. В настройках проекта используется максимальная оптимизация.
+Release mode is enabled and 10 threads are in use. Maximum optimization is used in the project settings.
 
 -------------------------------------------------------
 
@@ -89,6 +94,7 @@ Size 9:  0.109739
 Size 10:  1.20803
 Size 11:  11.9321
 Включен режим Release и используется 10 потоков. В настройках проекта оптимизация отключена.
+Release mode is enabled and 10 threads are in use. Optimization is disabled in the project settings.
 
 ----------------------------------------------------------
 
@@ -123,6 +129,10 @@ Size 12:  120.762
 Основной поток теперь тоже выполняет вычисления. За счёт этого уравнение размера 11 решается быстрее, так как я выделяю
 количество потоков - 2 (а у меня 12 потоков, выходит 10) и ещё один основной, как раз 11 размер считается 11 потоками.
 Но размер 12 просел, узкое место - расчёт главного определителя, который выполняется перед параллельной частью кода.
+Release mode is enabled and 10 threads are in use. Maximum optimization is used in the project settings.
+The main thread is now also performing calculations. Due to this, the equation of size 11 is solved faster, since I select
+the number of threads - 2 (and I have 12 threads, 10 comes out) and one more main, just 11 size is considered 11 threads.
+But the size 12 sank, the bottleneck is the calculation of the main determinant, which is performed before the parallel part of the code.
 
 ------------------------------------------------------
 
@@ -139,6 +149,8 @@ Size 11:  5.42008
 Size 12:  94.4984
 Включен режим Release и используется 10 потоков. В настройках проекта используется максимальная оптимизация.
 Узкое место(расчёт главного определителя перед параллельной частью) теперь выполняется параллельно с помощью async.
+Release mode is enabled and 10 threads are in use. Maximum optimization is used in the project settings.
+The bottleneck (calculating the main determinant, before the parallel part) is now done in parallel using async.
 
 ------------------------------------------------------
 
