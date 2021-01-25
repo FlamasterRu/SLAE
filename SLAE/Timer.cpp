@@ -13,7 +13,7 @@ Timer::~Timer()
 }
 
 
-void Timer::PrintTimeFromStart()
+void Timer::PrintTimeFromFirstStart() const
 {
     std::chrono::duration<double> duration = std::chrono::system_clock::now() - t_start;
     std::cout << duration.count() << " sec";

@@ -30,7 +30,7 @@ public:
 	template <typename T>
 	friend Log& operator<< (Log& log,const T str);		// Запись в Лог, как в поток
 
-	void writeLog(const std::string str);		// Запись через функцию
+	void writeLog(const std::string& str);		// Запись через функцию
 	void clearFile();
 
 

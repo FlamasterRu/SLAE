@@ -7,7 +7,7 @@
 
 
 
-int pow(const int b);		// возвращает +1 или -1 для расчёта определителя матрицы
+int pow(const int b);		// (-1)^(b) возвращает +1 или -1 для расчёта определителя матрицы
 
 void createRandMatrix(const int height, const int width, std::string fileName);		// создаёт матрицу со случайными значениями от -30 до +30 и записывает в файл,
 // который помещается в ту же папку, что и проект
@@ -31,7 +31,7 @@ public:
 	Matrix(const std::string fileName);
 	Matrix(const std::string fileName, const int width, const int height);
 	Matrix(const Matrix& m);
-	Matrix(const Matrix& m, const int line, const int col);
+	Matrix(const Matrix& m, const int line, const int col);		// строит матрицу из матрицы m, вырезая строку line и столбец col
 	Matrix(Matrix&& m) noexcept;
 
 	~Matrix();

@@ -64,7 +64,7 @@ void Log::deleteLog()
 
 
 
-void Log::writeLog(const std::string str)
+void Log::writeLog(const std::string& str)
 {
 	l_file << str << std::endl;
 }

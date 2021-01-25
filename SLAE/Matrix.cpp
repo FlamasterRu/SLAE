@@ -200,7 +200,7 @@ std::ostream& operator<< (std::ostream& out, const Matrix& m)
 	{
 		for (int j = 0; j < m.m_width; ++j)
 		{
-			out.width(4);
+			out.width(5);
 			if (j == m.m_width - 1)
 			{
 				out << m.m_arr[i][j];
@@ -227,6 +227,10 @@ double& Matrix::operator() (const int line, const int col) const
 	{
 		throw("Column access error");
 	}
+	if (m_arr == nullptr)
+	{
+		throw("Array was deleted");
+	}
 	return m_arr[line][col];
 }
 
@@ -241,6 +245,10 @@ Matrix Matrix::changeOneColumn(const Matrix& col, const int numCol) const
 	if (col.m_height != m_height)
 	{
 		throw("Line access error");
+	}
+	if (m_arr == nullptr)
+	{
+		throw("Array was deleted");
 	}
 
 	Matrix temp(*this);
@@ -318,7 +326,7 @@ Matrix solveSLAE(const Matrix& a, const Matrix& b)
 	unsigned int cores = std::thread::hardware_concurrency();
 	if (cores <= 2)
 	{
-		cores = 3;    // костыль маленький, на случай одно или двух€дерных пк
+		cores = 3;    // на случай одно или двух€дерных пк
 	}
 	std::queue<std::thread> threads;
 	std::queue<int> qu;

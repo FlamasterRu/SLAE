@@ -16,7 +16,7 @@ public:
 	~Timer();
 
 
-	void PrintTimeFromStart();		// Выводит в консоль полное время существования объекта Timer 
+	void PrintTimeFromFirstStart() const;		// Выводит в консоль полное время существования объекта Timer 
 	void StartTimer();			// Запускать перед участком кода, на котором происходит замер
 	double StopTimer();			// Возвращает время выполнения кода с момента последнего вызова StartTimer
 };
